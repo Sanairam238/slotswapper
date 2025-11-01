@@ -1,0 +1,8 @@
+-- CreateTable
+CREATE TABLE "Slot" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "date" TEXT NOT NULL,
+    "time" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
+    CONSTRAINT "Slot_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);

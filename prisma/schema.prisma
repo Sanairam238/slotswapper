@@ -1,0 +1,57 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  name     String?
+  email    String  @unique
+  password String
+
+  slots    Slot[]
+  sent     SwapRequest[] @relation("SentRequests")
+  received SwapRequest[] @relation("ReceivedRequests")
+  Event    Event[]
+}
+
+model Event {
+  id        Int      @id @default(autoincrement())
+  title     String
+  startTime DateTime
+  endTime   DateTime
+  status    String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Slot {
+  id        Int    @id @default(autoincrement())
+  date      String
+  time      String
+  status    String @default("AVAILABLE") // ✅ by default slot is available
+  userId    Int
+  user      User   @relation(fields: [userId], references: [id])
+
+  sentRequests     SwapRequest[] @relation("MySlotRequests")
+  receivedRequests SwapRequest[] @relation("TheirSlotRequests")
+}
+
+model SwapRequest {
+  id          Int     @id @default(autoincrement())
+  requesterId Int
+  receiverId  Int
+  mySlotId    Int
+  theirSlotId Int
+  status      String @default("PENDING") // ✅ default status
+
+  requester User @relation("SentRequests", fields: [requesterId], references: [id])
+  receiver  User @relation("ReceivedRequests", fields: [receiverId], references: [id])
+
+  mySlot    Slot @relation("MySlotRequests", fields: [mySlotId], references: [id])
+  theirSlot Slot @relation("TheirSlotRequests", fields: [theirSlotId], references: [id])
+}
